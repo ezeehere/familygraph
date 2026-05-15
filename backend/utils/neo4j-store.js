@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const { driver } = require("../db/neo4j");
 
 const allowedRelationshipTypes = [
