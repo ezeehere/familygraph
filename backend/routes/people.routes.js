@@ -12,12 +12,20 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
+    console.log("GET /api/people called");
+
     const people = await getAllPeople();
+
+    console.log("People fetched:", people.length);
+
     res.json(people);
   } catch (error) {
+    console.error("GET /api/people failed:", error);
+
     res.status(500).json({
       message: "Could not fetch people from Neo4j.",
-      error: error.message
+      error: error.message,
+      stack: error.stack
     });
   }
 });
