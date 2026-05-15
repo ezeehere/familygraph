@@ -4,7 +4,7 @@ const {
   getAllRelationships,
   addRelationship,
   deleteRelationship
-} = require("../utils/neo4jStore");
+} = require("../utils/neo4j-store");
 
 const router = express.Router();
 
