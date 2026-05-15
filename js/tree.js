@@ -686,7 +686,7 @@ function renderTree() {
     `;
   }
 
-  renderLegend();
+ 
 }
 
 
@@ -716,15 +716,7 @@ async function initTreePage() {
 
 initTreePage();
 
-function renderLegend() {
-  let legendBox = document.getElementById("relationLegend");
 
-  if (!legendBox) {
-    legendBox = document.createElement("div");
-    legendBox.id = "relationLegend";
-    legendBox.className = "relation-legend-box";
-    document.querySelector(".tree-screen").appendChild(legendBox);
-  }
 
   legendBox.innerHTML = `
     <h3>Relation guide</h3>
