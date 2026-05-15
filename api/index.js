@@ -3,6 +3,11 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
+const peopleRoutes = require("../backend/routes/people.routes.js");
+const relationshipRoutes = require("../backend/routes/relationships.routes.js");
+const dataRoutes = require("../backend/routes/data.routes.js");
+const neo4jRoutes = require("../backend/routes/neo4j.routes.js");
+
 const app = express();
 
 app.use(cors());
@@ -12,7 +17,14 @@ app.get("/api", (req, res) => {
   res.json({
     message: "FamilyGraph API is running on Vercel.",
     storage: "neo4j",
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    routes: {
+      health: "/api/health",
+      people: "/api/people",
+      relationships: "/api/relationships",
+      data: "/api/data",
+      neo4j: "/api/neo4j"
+    }
   });
 });
 
@@ -27,12 +39,13 @@ app.get("/api/env-check", (req, res) => {
 
 app.get("/api/health", async (req, res) => {
   try {
-    const { verifyNeo4jConnection } = require("../backend/db/neo4j");
+    const { verifyNeo4jConnection } = require("../backend/db/neo4j.js");
     const message = await verifyNeo4jConnection();
 
     res.json({
       status: "ok",
       message: "Backend and Neo4j connected",
+      storage: "neo4j",
       neo4j: message,
       timestamp: new Date().toISOString()
     });
@@ -45,31 +58,10 @@ app.get("/api/health", async (req, res) => {
   }
 });
 
-function safeUse(routePath, modulePath) {
-  try {
-    const route = require(modulePath);
-
-    if (typeof route !== "function") {
-      throw new Error(`${modulePath} did not export a router function.`);
-    }
-
-    app.use(routePath, route);
-  } catch (error) {
-    console.error(`Failed to load route ${routePath}:`, error);
-
-    app.use(routePath, (req, res) => {
-      res.status(500).json({
-        message: `Route ${routePath} failed to load.`,
-        error: error.message
-      });
-    });
-  }
-}
-
-safeUse("/api/people", "../backend/routes/people.routes");
-safeUse("/api/relationships", "../backend/routes/relationships.routes");
-safeUse("/api/data", "../backend/routes/data.routes");
-safeUse("/api/neo4j", "../backend/routes/neo4j.routes");
+app.use("/api/people", peopleRoutes);
+app.use("/api/relationships", relationshipRoutes);
+app.use("/api/data", dataRoutes);
+app.use("/api/neo4j", neo4jRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
