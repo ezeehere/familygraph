@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FamilyGraph</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <main class="app-frame">
+    <header class="top-bar">
+      <a class="brand-name" href="index.html">FamilyGraph</a>
+
+      <nav class="nav-links">
+        <a href="tree.html?id=aarav">Tree</a>
+        <a href="people.html">People</a>
+        <a href="path.html">Path</a>
+      </nav>
+    </header>
+
+    <section class="home-screen">
+      <div class="search-wrap">
+        <input
+          type="text"
+          id="homeSearch"
+          placeholder="Search person"
+          autocomplete="off"
+        />
+        <span class="search-icon">⌕</span>
+      </div>
+
+      <div id="searchResults" class="search-results"></div>
+    </section>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>

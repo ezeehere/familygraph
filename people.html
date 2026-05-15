@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FamilyGraph | People</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <main class="app-frame">
+    <header class="top-bar">
+      <a class="brand-name" href="index.html">FamilyGraph</a>
+
+      <nav class="nav-links">
+        <a href="tree.html?id=aarav">Tree</a>
+        <a href="people.html">People</a>
+        <a href="path.html">Path</a>
+      </nav>
+    </header>
+
+    <section class="people-screen">
+      <p class="page-label">People</p>
+
+      <div class="people-panel">
+        <div class="people-list" id="peopleList"></div>
+
+        <div class="people-actions">
+          <form class="add-person-box" id="addPersonForm">
+            <h3>Add person</h3>
+
+            <input type="text" id="personName" placeholder="Full name" required />
+
+            <select id="personGender">
+              <option value="unknown">Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="unknown">Other / Unknown</option>
+            </select>
+
+            <input type="text" id="personNote" placeholder="Small note" />
+
+            <button type="submit">Add Person</button>
+          </form>
+
+          <form class="add-person-box" id="addRelationForm">
+            <h3>Add relationship</h3>
+
+            <select id="fromPerson" required></select>
+
+            <select id="relationType" required>
+                <option value="PARENT_OF">is parent of</option>
+                <option value="MARRIED_TO">is married to</option>
+                <option value="FRIEND_OF">is friend of</option>
+
+                <option value="SIBLING_OF">is sibling of</option>
+                <option value="BROTHER_OF">is brother of</option>
+                <option value="SISTER_OF">is sister of</option>
+
+                <option value="GRANDFATHER_OF">is grandfather of</option>
+                <option value="GRANDMOTHER_OF">is grandmother of</option>
+
+                <option value="PATERNAL_UNCLE_OF">is paternal uncle of</option>
+                <option value="PATERNAL_AUNT_OF">is paternal aunt of</option>
+                <option value="MATERNAL_UNCLE_OF">is maternal uncle of</option>
+                <option value="MATERNAL_AUNT_OF">is maternal aunt of</option>
+
+                <option value="COUSIN_OF">is cousin of</option>
+                <option value="NEPHEW_OF">is nephew of</option>
+                <option value="NIECE_OF">is niece of</option>
+            </select>
+
+            <select id="toPerson" required></select>
+
+            <button type="submit">Add Relationship</button>
+
+            <p id="relationMessage" class="form-message"></p>
+          </form>
+        </div>
+      </div>
+
+      <div class="relation-list-box">
+  <div class="relation-list-header">
+    <h3>Stored relationships</h3>
+    <button id="clearCustomData" type="button">Refresh Backend Data</button>
+  </div>
+
+  <div id="relationshipList" class="relationship-list"></div>
+</div>
+
+<div class="backup-box">
+  <div class="backup-header">
+    <div>
+      <h3>Data backup</h3>
+      <p>Export, import, or reset your FamilyGraph backend data.</p>
+    </div>
+  </div>
+
+  <div class="backup-actions">
+    <button id="exportDataBtn" type="button">Export JSON</button>
+
+    <label class="import-file-label">
+      Import JSON
+      <input id="importDataInput" type="file" accept=".json,application/json" />
+    </label>
+
+    <button id="resetDataBtn" type="button">Reset Database</button>
+  </div>
+
+  <p id="backupMessage" class="form-message"></p>
+</div>
+
+        <div id="relationshipList" class="relationship-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/people.js"></script>
+</body>
+</html>
