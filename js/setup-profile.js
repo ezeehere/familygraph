@@ -52,7 +52,7 @@ setupProfileForm.addEventListener("submit", async (event) => {
       name: setupName.value.trim(),
       gender: setupGender.value,
       birthYear: setupBirthYear.value.trim(),
-      note: setupNote.value.trim() || "Root person",
+      note: setupNote.value.trim() || "Main person",
       isRoot: true,
       authUid: user.uid
     });
