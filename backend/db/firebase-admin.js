@@ -11,10 +11,16 @@ function getServiceAccount() {
   return JSON.parse(json);
 }
 
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(getServiceAccount())
-  });
+function getFirebaseAdmin() {
+  if (!admin.apps.length) {
+    admin.initializeApp({
+      credential: admin.credential.cert(getServiceAccount())
+    });
+  }
+
+  return admin;
 }
 
-module.exports = admin;
+module.exports = {
+  getFirebaseAdmin
+};

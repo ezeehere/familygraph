@@ -1,4 +1,4 @@
-const admin = require("../db/firebase-admin.js");
+const { getFirebaseAdmin } = require("../db/firebase-admin.js");
 
 async function requireAuth(req, res, next) {
   try {
@@ -11,6 +11,8 @@ async function requireAuth(req, res, next) {
     }
 
     const token = authHeader.replace("Bearer ", "");
+    const admin = getFirebaseAdmin();
+
     const decodedToken = await admin.auth().verifyIdToken(token);
 
     req.user = {

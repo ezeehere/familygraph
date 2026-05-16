@@ -34,6 +34,7 @@ app.get("/api/env-check", (req, res) => {
     hasNeo4jUri: Boolean(process.env.NEO4J_URI),
     hasNeo4jUsername: Boolean(process.env.NEO4J_USERNAME),
     hasNeo4jPassword: Boolean(process.env.NEO4J_PASSWORD),
+    hasFirebaseServiceAccount: Boolean(process.env.FIREBASE_SERVICE_ACCOUNT_BASE64),
     nodeEnv: process.env.NODE_ENV || "not set"
   });
 });
