@@ -9,7 +9,15 @@ const {
 } = require("../utils/neo4j-store.js");
 
 const router = express.Router();
+router.use((req, res, next) => {
+  if (!req.user || !req.user.uid) {
+    return res.status(401).json({
+      message: "User authentication missing in people route."
+    });
+  }
 
+  next();
+});
 router.get("/", async (req, res) => {
   try {
     const people = await getAllPeople(req.user.uid);

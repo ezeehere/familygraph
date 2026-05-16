@@ -1,13 +1,14 @@
 require("dotenv").config();
-
+const { requireAuth } = require("../backend/middleware/auth.middleware.js");
 const express = require("express");
 const cors = require("cors");
+
 
 const peopleRoutes = require("../backend/routes/people.routes.js");
 const relationshipRoutes = require("../backend/routes/relationships.routes.js");
 const dataRoutes = require("../backend/routes/data.routes.js");
 const neo4jRoutes = require("../backend/routes/neo4j.routes.js");
-const { requireAuth } = require("../backend/middleware/auth.middleware.js");
+
 
 const app = express();
 
