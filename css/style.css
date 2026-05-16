@@ -2723,3 +2723,342 @@ button {
     font-size: 18px;
   }
 }
+/* ================================
+   Final Mobile Polish
+   ================================ */
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+@media (max-width: 760px) {
+  body {
+    background: #edf2ee;
+  }
+
+  .app-frame {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    border-radius: 0;
+    border: none;
+  }
+
+  .top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255, 253, 248, 0.94);
+    backdrop-filter: blur(14px);
+    padding: 14px 14px 10px;
+    border-bottom: 1px solid #e1e6d8;
+  }
+
+  .brand-name {
+    font-size: 19px;
+  }
+
+  .brand-name::before {
+    width: 36px;
+    height: 36px;
+  }
+
+  .nav-links {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-links a,
+  .backend-status,
+  .auth-box {
+    flex: 0 0 auto;
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    background: #f4f8ed;
+    border: 1px solid #e1e6d8;
+  }
+
+  .auth-box {
+    background: var(--green-dark);
+    color: #fff;
+  }
+
+  .backend-status p {
+    font-size: 11px;
+  }
+
+  .page-label {
+    margin: 14px 0 10px;
+    font-size: 12px;
+  }
+
+  .home-screen,
+  .people-screen,
+  .tree-screen,
+  .profile-screen,
+  .path-screen,
+  .auth-screen {
+    padding: 12px 14px 90px;
+  }
+
+  .people-layout {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .form-card,
+  .people-list-box,
+  .relation-list-box,
+  .backup-box,
+  .profile-clean-card,
+  .path-panel,
+  .path-summary-card,
+  .path-chain,
+  .auth-card {
+    width: 100%;
+    border-radius: 22px;
+    padding: 18px;
+  }
+
+  .form-card h3,
+  .people-list-header h3,
+  .relation-list-header h3,
+  .backup-header h3,
+  .profile-clean-card h2 {
+    font-size: 17px;
+  }
+
+  input,
+  select,
+  textarea {
+    min-height: 48px;
+    font-size: 15px;
+  }
+
+  .form-card button,
+  .backup-actions button,
+  .import-file-label,
+  .find-path-btn,
+  .swap-btn,
+  .auth-form button,
+  .google-login-btn {
+    width: 100%;
+    min-height: 46px;
+    justify-content: center;
+  }
+
+  .backup-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .people-row,
+  .relationship-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 15px;
+    border-radius: 18px;
+  }
+
+  .person-row-info strong {
+    font-size: 15px;
+  }
+
+  .person-row-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .person-row-actions button,
+  .delete-relation-btn {
+    width: 100%;
+    min-height: 38px;
+    padding: 0 8px;
+    font-size: 12px;
+  }
+
+  .relationship-row strong,
+  .relationship-row span {
+    display: block;
+  }
+
+  .relationship-row span {
+    width: fit-content;
+  }
+
+  /* Profile page */
+  .profile-clean-header {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+  }
+
+  .profile-clean-card h1 {
+    font-size: 30px;
+    line-height: 1.1;
+  }
+
+  .profile-clean-meta {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .profile-clean-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .profile-clean-actions a,
+  .profile-clean-actions button {
+    width: 100%;
+  }
+
+  .profile-relation-item {
+    display: grid;
+    gap: 4px;
+    align-items: start;
+  }
+
+  /* Tree page */
+  #focusNode {
+    width: 100%;
+    min-height: 66px;
+    padding: 16px;
+    font-size: 16px;
+    border-radius: 20px;
+  }
+
+  .relation-table-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .relation-table-section {
+    border-radius: 22px;
+    padding: 16px;
+  }
+
+  .relation-table-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .relation-table-card {
+    width: 100%;
+    min-height: 70px;
+  }
+
+  /* Path page */
+  .path-panel {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .path-chain {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .path-person-card {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .path-connector {
+    width: 100%;
+    min-width: 100%;
+    min-height: 44px;
+  }
+
+  .path-connector::before {
+    left: 50%;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    height: 100%;
+    transform: translateX(-50%);
+  }
+
+  .smart-relation-sentence {
+    font-size: 15px;
+  }
+
+  /* Auth pages */
+  .auth-card h1 {
+    font-size: 28px;
+  }
+
+  .auth-card {
+    gap: 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  .top-bar {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .home-screen,
+  .people-screen,
+  .tree-screen,
+  .profile-screen,
+  .path-screen,
+  .auth-screen {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .person-row-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-links a,
+  .backend-status,
+  .auth-box {
+    font-size: 11px;
+    min-height: 32px;
+    padding: 0 10px;
+  }
+
+  .profile-clean-card h1 {
+    font-size: 26px;
+  }
+}
