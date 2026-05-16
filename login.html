@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>FamilyGraph | Login</title>
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <main class="app-frame">
+    <header class="top-bar">
+      <a class="brand-name" href="index.html">FamilyGraph</a>
+    </header>
+
+    <section class="auth-screen">
+      <div class="auth-card">
+        <h1>Login to FamilyGraph</h1>
+        <p>Your account will have its own private family tree.</p>
+
+        <form id="loginForm" class="auth-form">
+  <h3>Login</h3>
+
+  <input id="loginEmail" type="email" placeholder="Email" required />
+  <input id="loginPassword" type="password" placeholder="Password" required />
+
+  <button type="submit">Login</button>
+</form>
+
+<button id="googleSignInBtn" class="google-login-btn" type="button">
+  Continue with Google
+</button>
+
+<form id="signupForm" class="auth-form">
+  <h3>Create account</h3>
+
+  <input id="signupEmail" type="email" placeholder="Email" required />
+  <input id="signupPassword" type="password" placeholder="Password" required />
+
+  <button type="submit">Create Account</button>
+</form>
+        <p id="authMessage" class="form-message"></p>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

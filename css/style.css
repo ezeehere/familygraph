@@ -2070,6 +2070,119 @@ button {
   display: none !important;
 }
 
+.auth-screen {
+  min-height: 560px;
+  display: grid;
+  place-items: center;
+  padding: 24px 18px 90px;
+}
+
+.auth-card {
+  width: min(760px, 100%);
+  background: rgba(255, 253, 248, 0.92);
+  border: 1px solid #e1e6d8;
+  border-radius: 28px;
+  box-shadow: 0 16px 36px rgba(53, 69, 38, 0.09);
+  padding: 28px;
+  display: grid;
+  gap: 20px;
+}
+
+.auth-card h1 {
+  margin: 0;
+  color: var(--green-dark);
+  font-size: clamp(28px, 4vw, 42px);
+}
+
+.auth-card p {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.auth-form {
+  display: grid;
+  gap: 12px;
+}
+
+.auth-form h3 {
+  margin: 0;
+  color: var(--green-dark);
+}
+
+.auth-form input {
+  min-height: 48px;
+  border-radius: 16px;
+  border: 1px solid #e1e6d8;
+  background: #fffdf8;
+  padding: 0 14px;
+  font-size: 15px;
+}
+
+.auth-form button {
+  min-height: 42px;
+  border-radius: 999px;
+  background: var(--green-dark);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 0 16px;
+}
+
+@media (max-width: 620px) {
+  .auth-card {
+    border-radius: 22px;
+    padding: 20px;
+  }
+
+  .auth-form button {
+    width: 100%;
+  }
+}
+
+.google-login-btn {
+  min-height: 44px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #1f2418;
+  border: 1px solid #dce5cf;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 0 16px;
+  box-shadow: 0 10px 24px rgba(53, 69, 38, 0.07);
+}
+
+.google-login-btn:hover {
+  transform: translateY(-1px);
+  background: #f8faf5;
+}
+
+@media (max-width: 620px) {
+  .google-login-btn {
+    width: 100%;
+  }
+}
+
+.auth-box {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--green-dark);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.auth-box:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 620px) {
+  .auth-box {
+    width: fit-content;
+  }
+}
 /* ================================
    Mobile Web Cleanup
    ================================ */

@@ -7,6 +7,7 @@ const peopleRoutes = require("../backend/routes/people.routes.js");
 const relationshipRoutes = require("../backend/routes/relationships.routes.js");
 const dataRoutes = require("../backend/routes/data.routes.js");
 const neo4jRoutes = require("../backend/routes/neo4j.routes.js");
+const { requireAuth } = require("../backend/middleware/auth.middleware.js");
 
 const app = express();
 
@@ -56,6 +57,14 @@ app.get("/api/health", async (req, res) => {
       error: error.message
     });
   }
+});
+
+app.get("/api/me", requireAuth, (req, res) => {
+  res.json({
+    uid: req.user.uid,
+    email: req.user.email,
+    name: req.user.name
+  });
 });
 
 app.use("/api/people", peopleRoutes);
