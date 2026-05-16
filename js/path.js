@@ -400,26 +400,32 @@ function buildPath(previous, startId, endId) {
   };
 }
 
-function renderPersonOptions() {
+function populatePersonDropdowns() {
+  const fromSelect = document.getElementById("fromPersonSelect");
+  const toSelect = document.getElementById("toPersonSelect");
+
+  if (!fromSelect || !toSelect) {
+    console.error("Path dropdown IDs not found.");
+    return;
+  }
+
   const people = FamilyUtils.getAllPeople();
 
-  startPerson.innerHTML = "";
-  endPerson.innerHTML = "";
+  fromSelect.innerHTML = `<option value="">Select person</option>`;
+  toSelect.innerHTML = `<option value="">Select person</option>`;
 
   people.forEach((person) => {
-    const optionA = document.createElement("option");
-    optionA.value = person.id;
-    optionA.textContent = person.name;
+    const optionOne = document.createElement("option");
+    optionOne.value = person.id;
+    optionOne.textContent = person.name;
 
-    const optionB = document.createElement("option");
-    optionB.value = person.id;
-    optionB.textContent = person.name;
+    const optionTwo = document.createElement("option");
+    optionTwo.value = person.id;
+    optionTwo.textContent = person.name;
 
-    startPerson.appendChild(optionA);
-    endPerson.appendChild(optionB);
+    fromSelect.appendChild(optionOne);
+    toSelect.appendChild(optionTwo);
   });
-
-  console.log("Dropdown options rendered:", people.length);
 }
 
 function renderPathResult(result, startId, endId) {
@@ -541,39 +547,44 @@ swapPeopleBtn.addEventListener("click", () => {
 });
 
 async function initPathPage() {
-  pathResult.innerHTML = `
-    <div class="empty-family-state">
-      Loading people from backend...
-    </div>
-  `;
+  const pathResult = document.getElementById("pathResult");
 
-  const loadResult = await FamilyUtils.loadData();
+  if (pathResult) {
+    pathResult.innerHTML = "Loading people...";
+  }
 
-  console.log("Path page backend load:", loadResult);
-  console.log("People loaded:", FamilyUtils.getAllPeople());
-  console.log("Relationships loaded:", FamilyUtils.getAllRelationships());
+  const result = await FamilyUtils.loadData();
+
+  if (!result.success) {
+    if (pathResult) {
+      pathResult.innerHTML = result.message;
+    }
+    return;
+  }
 
   const people = FamilyUtils.getAllPeople();
 
-    if (!people || people.length === 0) {
-      window.location.href = "setup-profile.html";
-      return;
-    }
+  if (!people || people.length === 0) {
+    window.location.href = "setup-profile.html";
+    return;
+  }
 
-    if (people.length < 2) {
-      pathResult.innerHTML = `
-        <div class="empty-family-state">
-          Add at least two people to find a relationship path.
-        </div>
-      `;
-      return;
-    }
+  populatePersonDropdowns();
 
-  startPerson.value = people[0].id;
-  endPerson.value = people[1].id;
+  if (people.length < 2 && pathResult) {
+    pathResult.innerHTML = `
+      <div class="empty-family-state">
+        Add at least two people to find a relationship path.
+      </div>
+    `;
+    return;
+  }
 
-  const initialResult = findShortestPath(startPerson.value, endPerson.value);
-  renderPathResult(initialResult, startPerson.value, endPerson.value);
+  if (pathResult) {
+    pathResult.innerHTML = "Please select valid people.";
+  }
 }
+
+initPathPage();
 
 initPathPage();
