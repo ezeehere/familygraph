@@ -3127,3 +3127,60 @@ a {
   color: #7a4318;
   border-color: #c78648;
 }
+select,
+option,
+input,
+button,
+textarea {
+  font-family: inherit;
+}
+
+.path-panel select {
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2418;
+  background: #fffdf8;
+  border: 1px solid #e1e6d8;
+  border-radius: 18px;
+  min-height: 56px;
+  padding: 0 18px;
+}
+
+.path-panel label {
+  font-family: inherit;
+  font-weight: 900;
+  color: var(--green-dark);
+}
+
+.path-summary-card {
+  width: min(900px, 100%);
+  margin: 24px auto;
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(255, 253, 248, 0.92);
+  border: 1px solid #e1e6d8;
+}
+
+.path-summary-card h3 {
+  margin: 0 0 12px;
+  color: var(--green-dark);
+}
+
+.assamese-relation-sentence {
+  margin-top: 10px;
+  background: #fff6ed;
+  color: #7a4318;
+  border: 1px solid #e9c29f;
+}
+
+.empty-family-state {
+  width: min(900px, 100%);
+  margin: 24px auto;
+  padding: 22px;
+  border-radius: 22px;
+  background: rgba(255, 253, 248, 0.92);
+  border: 1px dashed #d8dfcc;
+  color: #4d5549;
+  font-weight: 800;
+}

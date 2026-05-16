@@ -1,328 +1,54 @@
-const startPerson = document.getElementById("startPerson");
-const endPerson = document.getElementById("endPerson");
+const fromPersonSelect = document.getElementById("fromPersonSelect");
+const toPersonSelect = document.getElementById("toPersonSelect");
+const swapPathBtn = document.getElementById("swapPathBtn");
 const findPathBtn = document.getElementById("findPathBtn");
-const swapPeopleBtn = document.getElementById("swapPeopleBtn");
 const pathResult = document.getElementById("pathResult");
 
-function getGenderBasedLabel(person, maleLabel, femaleLabel, neutralLabel) {
-  if (!person) return neutralLabel;
-  if (person.gender === "male") return maleLabel;
-  if (person.gender === "female") return femaleLabel;
-  return neutralLabel;
-}
+function populatePersonDropdowns() {
+  const people = FamilyUtils.getAllPeople();
 
-function getPossessiveName(name) {
-  if (name.endsWith("s")) {
-    return `${name}'`;
+  if (!fromPersonSelect || !toPersonSelect) {
+    console.error("Path dropdown IDs not found.");
+    return;
   }
 
-  return `${name}'s`;
-}
+  fromPersonSelect.innerHTML = `<option value="">Select person</option>`;
+  toPersonSelect.innerHTML = `<option value="">Select person</option>`;
 
-function getRoleByGender(person, maleLabel, femaleLabel, neutralLabel) {
-  if (!person) return neutralLabel;
-  if (person.gender === "male") return maleLabel;
-  if (person.gender === "female") return femaleLabel;
-  return neutralLabel;
-}
+  people.forEach((person) => {
+    const fromOption = document.createElement("option");
+    fromOption.value = person.id;
+    fromOption.textContent = person.name;
 
-function getParentRole(person) {
-  return getRoleByGender(person, "father", "mother", "parent");
-}
+    const toOption = document.createElement("option");
+    toOption.value = person.id;
+    toOption.textContent = person.name;
 
-function getChildRole(person) {
-  return getRoleByGender(person, "son", "daughter", "child");
-}
-
-function getSiblingRole(person) {
-  return getRoleByGender(person, "brother", "sister", "sibling");
-}
-
-function getGrandparentRole(person) {
-  return getRoleByGender(person, "grandfather", "grandmother", "grandparent");
-}
-
-function getGrandchildRole(person) {
-  return getRoleByGender(person, "grandson", "granddaughter", "grandchild");
-}
-
-function getUncleAuntRole(person) {
-  return getRoleByGender(person, "uncle", "aunt", "uncle/aunt");
-}
-
-function getNephewNieceRole(person) {
-  return getRoleByGender(person, "nephew", "niece", "nephew/niece");
-}
-
-function getLabelKind(label) {
-  const childLabels = ["Son", "Daughter", "Child"];
-  const parentLabels = ["Father", "Mother", "Parent"];
-  const siblingLabels = ["Brother", "Sister", "Sibling"];
-  const grandchildLabels = ["Grandson", "Granddaughter", "Grandchild"];
-  const grandparentLabels = ["Grandpa", "Grandma", "Grandparent"];
-  const nephewNieceLabels = ["Nephew", "Niece", "Nephew/Niece"];
-  const uncleAuntLabels = [
-    "Uncle",
-    "Aunt",
-    "Uncle/Aunt",
-    "Paternal Uncle",
-    "Paternal Aunt",
-    "Maternal Uncle",
-    "Maternal Aunt"
-  ];
-
-  if (childLabels.includes(label)) return "down";
-  if (parentLabels.includes(label)) return "up";
-  if (siblingLabels.includes(label)) return "sibling";
-  if (grandchildLabels.includes(label)) return "grandchild";
-  if (grandparentLabels.includes(label)) return "grandparent";
-  if (nephewNieceLabels.includes(label)) return "nephewNiece";
-  if (uncleAuntLabels.includes(label)) return "uncleAunt";
-  if (label === "Spouse") return "spouse";
-  if (label === "Friend") return "friend";
-  if (label === "Cousin") return "cousin";
-
-  return "unknown";
-}
-
-function addGreatPrefix(baseRelation, stepCount) {
-  if (stepCount === 2) {
-    return baseRelation;
-  }
-
-  const greatCount = stepCount - 2;
-  const prefix = Array(greatCount).fill("great").join("-");
-
-  return `${prefix}-${baseRelation}`;
-}
-
-function makeRelationSentence(start, end, relationText) {
-  return `${start.name} is ${getPossessiveName(end.name)} ${relationText}.`;
-}
-
-function getDirectRelationMeaning(start, end, step) {
-  const kind = getLabelKind(step.label);
-
-  if (kind === "down") {
-    return getParentRole(start);
-  }
-
-  if (kind === "up") {
-    return getChildRole(start);
-  }
-
-  if (kind === "sibling") {
-    return getSiblingRole(start);
-  }
-
-  if (kind === "spouse") {
-    return "spouse";
-  }
-
-  if (kind === "friend") {
-    return "friend";
-  }
-
-  if (kind === "cousin") {
-    return "cousin";
-  }
-
-  if (kind === "grandchild") {
-    return getGrandparentRole(start);
-  }
-
-  if (kind === "grandparent") {
-    return getGrandchildRole(start);
-  }
-
-  if (kind === "nephewNiece") {
-    return getUncleAuntRole(start);
-  }
-
-  if (kind === "uncleAunt") {
-    return getNephewNieceRole(start);
-  }
-
-  return null;
-}
-
-function getSmartRelationSentence(start, end, steps) {
-  if (!steps || steps.length === 0) {
-    return `${start.name} and ${end.name} are the same person.`;
-  }
-
-  if (steps.length === 1) {
-    const relation = getDirectRelationMeaning(start, end, steps[0]);
-
-    if (relation) {
-      return makeRelationSentence(start, end, relation);
-    }
-  }
-
-  const kinds = steps.map((step) => getLabelKind(step.label));
-
-  const allDown = kinds.every((kind) => kind === "down");
-  const allUp = kinds.every((kind) => kind === "up");
-
-  if (allDown && steps.length >= 2) {
-    const relation = addGreatPrefix(getGrandparentRole(start), steps.length);
-    return makeRelationSentence(start, end, relation);
-  }
-
-  if (allUp && steps.length >= 2) {
-    const relation = addGreatPrefix(getGrandchildRole(start), steps.length);
-    return makeRelationSentence(start, end, relation);
-  }
-
-  if (
-    steps.length === 2 &&
-    kinds[0] === "sibling" &&
-    kinds[1] === "down"
-  ) {
-    return makeRelationSentence(start, end, getUncleAuntRole(start));
-  }
-
-  if (
-    steps.length === 2 &&
-    kinds[0] === "up" &&
-    kinds[1] === "sibling"
-  ) {
-    return makeRelationSentence(start, end, getNephewNieceRole(start));
-  }
-
-  if (
-    steps.length === 3 &&
-    kinds[0] === "up" &&
-    kinds[1] === "sibling" &&
-    kinds[2] === "down"
-  ) {
-    return makeRelationSentence(start, end, "cousin");
-  }
-
-  return `${start.name} is connected to ${end.name} through ${steps.length} relationship steps.`;
-}
-
-function getRelationLabelForPath(relation, currentId, nextId) {
-  const currentIsFrom = relation.from === currentId;
-  const nextPerson = FamilyUtils.getPersonById(nextId);
-
-  switch (relation.type) {
-    case "PARENT_OF":
-      if (currentIsFrom) {
-        return getGenderBasedLabel(nextPerson, "Son", "Daughter", "Child");
-      }
-
-      return getGenderBasedLabel(nextPerson, "Father", "Mother", "Parent");
-
-    case "MARRIED_TO":
-      return "Spouse";
-
-    case "FRIEND_OF":
-      return "Friend";
-
-    case "SIBLING_OF":
-    case "BROTHER_OF":
-    case "SISTER_OF":
-      return getGenderBasedLabel(nextPerson, "Brother", "Sister", "Sibling");
-
-    case "COUSIN_OF":
-      return "Cousin";
-
-    case "GRANDFATHER_OF":
-      if (currentIsFrom) {
-        return getGenderBasedLabel(nextPerson, "Grandson", "Granddaughter", "Grandchild");
-      }
-
-      return "Grandpa";
-
-    case "GRANDMOTHER_OF":
-      if (currentIsFrom) {
-        return getGenderBasedLabel(nextPerson, "Grandson", "Granddaughter", "Grandchild");
-      }
-
-      return "Grandma";
-
-    case "PATERNAL_UNCLE_OF":
-      if (currentIsFrom) {
-        return getGenderBasedLabel(nextPerson, "Nephew", "Niece", "Nephew/Niece");
-      }
-
-      return "Paternal Uncle";
-
-    case "PATERNAL_AUNT_OF":
-      if (currentIsFrom) {
-        return getGenderBasedLabel(nextPerson, "Nephew", "Niece", "Nephew/Niece");
-      }
-
-      return "Paternal Aunt";
-
-    case "MATERNAL_UNCLE_OF":
-      if (currentIsFrom) {
-        return getGenderBasedLabel(nextPerson, "Nephew", "Niece", "Nephew/Niece");
-      }
-
-      return "Maternal Uncle";
-
-    case "MATERNAL_AUNT_OF":
-      if (currentIsFrom) {
-        return getGenderBasedLabel(nextPerson, "Nephew", "Niece", "Nephew/Niece");
-      }
-
-      return "Maternal Aunt";
-
-    case "NEPHEW_OF":
-      if (currentIsFrom) {
-        return getGenderBasedLabel(nextPerson, "Uncle", "Aunt", "Uncle/Aunt");
-      }
-
-      return "Nephew";
-
-    case "NIECE_OF":
-      if (currentIsFrom) {
-        return getGenderBasedLabel(nextPerson, "Uncle", "Aunt", "Uncle/Aunt");
-      }
-
-      return "Niece";
-
-    default:
-      return "Related";
-  }
+    fromPersonSelect.appendChild(fromOption);
+    toPersonSelect.appendChild(toOption);
+  });
 }
 
 function buildGraph() {
-  const graph = new Map();
-  const people = FamilyUtils.getAllPeople();
   const relationships = FamilyUtils.getAllRelationships();
+  const graph = new Map();
 
-  people.forEach((person) => {
-    graph.set(person.id, []);
-  });
+  function addConnection(from, to, relation, direction) {
+    if (!graph.has(from)) {
+      graph.set(from, []);
+    }
+
+    graph.get(from).push({
+      from,
+      to,
+      relation,
+      direction
+    });
+  }
 
   relationships.forEach((relation) => {
-    const fromPerson = FamilyUtils.getPersonById(relation.from);
-    const toPerson = FamilyUtils.getPersonById(relation.to);
-
-    if (!fromPerson || !toPerson) return;
-
-    if (!graph.has(relation.from)) {
-      graph.set(relation.from, []);
-    }
-
-    if (!graph.has(relation.to)) {
-      graph.set(relation.to, []);
-    }
-
-    graph.get(relation.from).push({
-      to: relation.to,
-      label: getRelationLabelForPath(relation, relation.from, relation.to),
-      type: relation.type
-    });
-
-    graph.get(relation.to).push({
-      to: relation.from,
-      label: getRelationLabelForPath(relation, relation.to, relation.from),
-      type: relation.type
-    });
+    addConnection(relation.from, relation.to, relation, "forward");
+    addConnection(relation.to, relation.from, relation, "reverse");
   });
 
   return graph;
@@ -331,224 +57,264 @@ function buildGraph() {
 function findShortestPath(startId, endId) {
   if (startId === endId) {
     return {
-      found: true,
+      peoplePath: [startId],
       steps: []
     };
   }
 
   const graph = buildGraph();
-  const queue = [startId];
+  const queue = [
+    {
+      personId: startId,
+      peoplePath: [startId],
+      steps: []
+    }
+  ];
+
   const visited = new Set([startId]);
-  const previous = new Map();
 
   while (queue.length > 0) {
-    const currentId = queue.shift();
-    const edges = graph.get(currentId) || [];
+    const current = queue.shift();
+    const connections = graph.get(current.personId) || [];
 
-    for (const edge of edges) {
-      if (visited.has(edge.to)) continue;
+    for (const connection of connections) {
+      if (visited.has(connection.to)) continue;
 
-      visited.add(edge.to);
+      const nextPeoplePath = [...current.peoplePath, connection.to];
+      const nextSteps = [...current.steps, connection];
 
-      previous.set(edge.to, {
-        from: currentId,
-        label: edge.label,
-        type: edge.type
-      });
-
-      if (edge.to === endId) {
-        return buildPath(previous, startId, endId);
+      if (connection.to === endId) {
+        return {
+          peoplePath: nextPeoplePath,
+          steps: nextSteps
+        };
       }
 
-      queue.push(edge.to);
+      visited.add(connection.to);
+
+      queue.push({
+        personId: connection.to,
+        peoplePath: nextPeoplePath,
+        steps: nextSteps
+      });
     }
   }
 
-  return {
-    found: false,
-    steps: []
-  };
+  return null;
 }
 
-function buildPath(previous, startId, endId) {
-  const steps = [];
-  let currentId = endId;
+function getRelationName(step, currentPerson, nextPerson) {
+  const relation = step.relation;
+  const isForward = step.direction === "forward";
 
-  while (currentId !== startId) {
-    const prev = previous.get(currentId);
-
-    if (!prev) {
-      return {
-        found: false,
-        steps: []
-      };
+  if (relation.type === "PARENT_OF") {
+    if (isForward) {
+      if (nextPerson.gender === "male") return "son";
+      if (nextPerson.gender === "female") return "daughter";
+      return "child";
     }
 
-    steps.unshift({
-      from: prev.from,
-      to: currentId,
-      label: prev.label,
-      type: prev.type
-    });
-
-    currentId = prev.from;
+    if (nextPerson.gender === "male") return "father";
+    if (nextPerson.gender === "female") return "mother";
+    return "parent";
   }
 
-  return {
-    found: true,
-    steps
-  };
+  if (relation.type === "MARRIED_TO") {
+    if (nextPerson.gender === "male") return "husband";
+    if (nextPerson.gender === "female") return "wife";
+    return "spouse";
+  }
+
+  if (relation.type === "FRIEND_OF") return "friend";
+  if (relation.type === "SIBLING_OF") return "sibling";
+  if (relation.type === "BROTHER_OF") return "brother";
+  if (relation.type === "SISTER_OF") return "sister";
+
+  if (relation.type === "GRANDFATHER_OF") {
+    return isForward ? "grandchild" : "grandfather";
+  }
+
+  if (relation.type === "GRANDMOTHER_OF") {
+    return isForward ? "grandchild" : "grandmother";
+  }
+
+  if (relation.type === "PATERNAL_UNCLE_OF") {
+    return isForward ? "nephew/niece" : "paternal uncle";
+  }
+
+  if (relation.type === "PATERNAL_AUNT_OF") {
+    return isForward ? "nephew/niece" : "paternal aunt";
+  }
+
+  if (relation.type === "MATERNAL_UNCLE_OF") {
+    return isForward ? "nephew/niece" : "maternal uncle";
+  }
+
+  if (relation.type === "MATERNAL_AUNT_OF") {
+    return isForward ? "nephew/niece" : "maternal aunt";
+  }
+
+  if (relation.type === "COUSIN_OF") return "cousin";
+  if (relation.type === "NEPHEW_OF") return isForward ? "uncle/aunt" : "nephew";
+  if (relation.type === "NIECE_OF") return isForward ? "uncle/aunt" : "niece";
+
+  return "related";
 }
 
-function populatePersonDropdowns() {
-  const fromSelect = document.getElementById("fromPersonSelect");
-  const toSelect = document.getElementById("toPersonSelect");
+const assameseRelationMap = {
+  father: "দেউতা",
+  mother: "মা",
+  parent: "অভিভাৱক",
+  son: "পুত্ৰ",
+  daughter: "কন্যা",
+  child: "সন্তান",
+  husband: "স্বামী",
+  wife: "স্ত্ৰী",
+  spouse: "জীৱনসঙ্গী",
+  friend: "বন্ধু",
+  sibling: "ভাই / ভনী",
+  brother: "ভাই",
+  sister: "ভনী",
+  grandfather: "ককা",
+  grandmother: "আইতা",
+  grandchild: "নাতি / নাতিনী",
+  "paternal uncle": "দেউতা ফালৰ খুড়া / জেঠা",
+  "paternal aunt": "পেহী",
+  "maternal uncle": "মামা",
+  "maternal aunt": "মাহী",
+  cousin: "কাজিন / সম্পৰ্কীয় ভাই-ভনী",
+  nephew: "ভতিজা / ভাগিনা",
+  niece: "ভতিজী / ভাগিনী",
+  "nephew/niece": "ভতিজা / ভতিজী / ভাগিনা / ভাগিনী",
+  "uncle/aunt": "খুড়া / মামা / পেহী / মাহী",
+  related: "সম্পৰ্কীয়"
+};
 
-  if (!fromSelect || !toSelect) {
-    console.error("Path dropdown IDs not found.");
-    return;
+function getSmartRelationSentence(startPerson, endPerson, result) {
+  if (result.steps.length === 0) {
+    return `${startPerson.name} and ${endPerson.name} are the same person.`;
   }
 
-  const people = FamilyUtils.getAllPeople();
+  if (result.steps.length === 1) {
+    const step = result.steps[0];
+    const relationName = getRelationName(step, startPerson, endPerson);
 
-  fromSelect.innerHTML = `<option value="">Select person</option>`;
-  toSelect.innerHTML = `<option value="">Select person</option>`;
+    return `${endPerson.name} is ${startPerson.name}'s ${relationName}.`;
+  }
 
-  people.forEach((person) => {
-    const optionOne = document.createElement("option");
-    optionOne.value = person.id;
-    optionOne.textContent = person.name;
+  return `${startPerson.name} and ${endPerson.name} are connected through ${result.steps.length} relationship steps.`;
+}
 
-    const optionTwo = document.createElement("option");
-    optionTwo.value = person.id;
-    optionTwo.textContent = person.name;
+function getAssameseSentence(startPerson, endPerson, result) {
+  if (result.steps.length === 0) {
+    return `${startPerson.name} আৰু ${endPerson.name} একেই ব্যক্তি।`;
+  }
 
-    fromSelect.appendChild(optionOne);
-    toSelect.appendChild(optionTwo);
-  });
+  if (result.steps.length === 1) {
+    const step = result.steps[0];
+    const relationName = getRelationName(step, startPerson, endPerson);
+    const assameseRelation = assameseRelationMap[relationName] || "সম্পৰ্কীয়";
+
+    return `${endPerson.name} হৈছে ${startPerson.name}ৰ ${assameseRelation}।`;
+  }
+
+  return `${startPerson.name} আৰু ${endPerson.name}ৰ মাজত ${result.steps.length}টা সম্পৰ্কীয় ধাপ আছে।`;
 }
 
 function renderPathResult(result, startId, endId) {
-  const start = FamilyUtils.getPersonById(startId);
-  const end = FamilyUtils.getPersonById(endId);
+  const startPerson = FamilyUtils.getPersonById(startId);
+  const endPerson = FamilyUtils.getPersonById(endId);
 
-  pathResult.innerHTML = "";
+  if (!startPerson || !endPerson) {
+    pathResult.innerHTML = `<div class="empty-family-state">Please select valid people.</div>`;
+    return;
+  }
 
-  if (!start || !end) {
+  if (!result) {
     pathResult.innerHTML = `
-      <div class="empty-family-state">
-        Please select valid people.
-      </div>
+      <section class="path-summary-card">
+        <h3>No relationship path found</h3>
+        <p>${startPerson.name} and ${endPerson.name} are not connected yet.</p>
+        <p class="assamese-relation-sentence">
+          ${startPerson.name} আৰু ${endPerson.name}ৰ মাজত এতিয়ালৈকে কোনো সম্পৰ্ক যোগ কৰা হোৱা নাই।
+        </p>
+      </section>
     `;
     return;
   }
 
-  if (startId === endId) {
-    pathResult.innerHTML = `
-      <div class="path-summary-card">
-        <h3>Same person selected</h3>
-        <p>${start.name} is the same person.</p>
+  const smartSentence = getSmartRelationSentence(startPerson, endPerson, result);
+  const assameseSentence = getAssameseSentence(startPerson, endPerson, result);
+
+  const pathCards = result.peoplePath
+    .map((personId, index) => {
+      const person = FamilyUtils.getPersonById(personId);
+      const nextStep = result.steps[index];
+
+      return `
+        <div class="path-person-card">
+          <strong>${person.name}</strong>
+          <small>${person.gender || "unknown"}</small>
+        </div>
+
+        ${
+          nextStep
+            ? `<div class="path-connector">
+                ${getRelationName(
+                  nextStep,
+                  FamilyUtils.getPersonById(nextStep.from),
+                  FamilyUtils.getPersonById(nextStep.to)
+                )}
+              </div>`
+            : ""
+        }
+      `;
+    })
+    .join("");
+
+  pathResult.innerHTML = `
+    <section class="path-summary-card">
+      <h3>Connection found</h3>
+
+      <div class="smart-relation-sentence">
+        ${smartSentence}
       </div>
-    `;
-    return;
-  }
 
-  if (!result.found) {
-    pathResult.innerHTML = `
-      <div class="path-summary-card">
-        <h3>No connection found</h3>
-        <p>No relationship path found between ${start.name} and ${end.name}.</p>
+      <div class="smart-relation-sentence assamese-relation-sentence">
+        ${assameseSentence}
       </div>
-    `;
-    return;
-  }
 
-  const chain = document.createElement("div");
-  chain.className = "path-chain";
+      <p>
+        Path length: ${result.steps.length} step${result.steps.length === 1 ? "" : "s"}.
+      </p>
+    </section>
 
-  const summary = document.createElement("div");
-  summary.className = "path-summary-card";
-
-const smartSentence = getSmartRelationSentence(start, end, result.steps);
-const assameseSentence = getAssameseRelationSentence(
-  smartSentence,
-  start,
-  end,
-  result.steps.length
-);
-
-summary.innerHTML = `
-  <h3>Connection found</h3>
-
-  <div class="smart-relation-sentence">
-    ${smartSentence}
-  </div>
-
-  <div class="smart-relation-sentence assamese-relation-sentence">
-    ${assameseSentence}
-  </div>
-
-  <p>
-    Path length:
-    ${result.steps.length} step${result.steps.length === 1 ? "" : "s"}.
-  </p>
-`;
-
-  pathResult.appendChild(summary);
-
-  const firstPersonCard = createPathPersonCard(start);
-  chain.appendChild(firstPersonCard);
-
-  result.steps.forEach((step) => {
-    const nextPerson = FamilyUtils.getPersonById(step.to);
-
-    const connector = document.createElement("div");
-    connector.className = "path-connector";
-    connector.innerHTML = `
-      <span>${step.label}</span>
-    `;
-
-    chain.appendChild(connector);
-    chain.appendChild(createPathPersonCard(nextPerson));
-  });
-
-  pathResult.appendChild(chain);
-}
-
-function createPathPersonCard(person) {
-  const card = document.createElement("button");
-  card.type = "button";
-  card.className = "path-person-card";
-
-  card.innerHTML = `
-    <span>${FamilyUtils.getInitials(person.name)}</span>
-    <strong>${person.name}</strong>
+    <section class="path-chain">
+      ${pathCards}
+    </section>
   `;
-
-  card.addEventListener("click", () => {
-    window.location.href = `profile.html?id=${person.id}`;
-  });
-
-  return card;
 }
 
-findPathBtn.addEventListener("click", () => {
-  const result = findShortestPath(startPerson.value, endPerson.value);
-  renderPathResult(result, startPerson.value, endPerson.value);
-});
+function handleFindPath() {
+  const fromId = fromPersonSelect.value;
+  const toId = toPersonSelect.value;
 
-swapPeopleBtn.addEventListener("click", () => {
-  const oldStart = startPerson.value;
-  startPerson.value = endPerson.value;
-  endPerson.value = oldStart;
+  if (!fromId || !toId) {
+    pathResult.innerHTML = `<div class="empty-family-state">Please select valid people.</div>`;
+    return;
+  }
 
-  const result = findShortestPath(startPerson.value, endPerson.value);
-  renderPathResult(result, startPerson.value, endPerson.value);
-});
+  const result = findShortestPath(fromId, toId);
+  renderPathResult(result, fromId, toId);
+}
+
+function handleSwap() {
+  const oldFrom = fromPersonSelect.value;
+  fromPersonSelect.value = toPersonSelect.value;
+  toPersonSelect.value = oldFrom;
+}
 
 async function initPathPage() {
-  const pathResult = document.getElementById("pathResult");
-
   if (pathResult) {
     pathResult.innerHTML = "Loading people...";
   }
@@ -556,9 +322,7 @@ async function initPathPage() {
   const result = await FamilyUtils.loadData();
 
   if (!result.success) {
-    if (pathResult) {
-      pathResult.innerHTML = result.message;
-    }
+    pathResult.innerHTML = result.message;
     return;
   }
 
@@ -571,7 +335,7 @@ async function initPathPage() {
 
   populatePersonDropdowns();
 
-  if (people.length < 2 && pathResult) {
+  if (people.length < 2) {
     pathResult.innerHTML = `
       <div class="empty-family-state">
         Add at least two people to find a relationship path.
@@ -580,8 +344,15 @@ async function initPathPage() {
     return;
   }
 
-  if (pathResult) {
-    pathResult.innerHTML = "Please select valid people.";
+  pathResult.innerHTML = "Please select valid people.";
+
+  if (findPathBtn) {
+    findPathBtn.addEventListener("click", handleFindPath);
+  }
+
+  if (swapPathBtn) {
+    swapPathBtn.addEventListener("click", handleSwap);
   }
 }
+
 initPathPage();
