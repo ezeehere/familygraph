@@ -3,6 +3,33 @@ const API_BASE_URL =
     ? "http://localhost:5000/api"
     : "/api";
 
+
+  async function getFirebaseAuthToken() {
+  if (!window.firebase || !firebase.auth) {
+    throw new Error("Firebase Auth is not loaded.");
+  }
+
+  const auth = firebase.auth();
+
+  const user =
+    auth.currentUser ||
+    (await new Promise((resolve) => {
+      const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+        unsubscribe();
+        resolve(firebaseUser);
+      });
+    }));
+
+  if (!user) {
+    const currentPage =
+      window.location.pathname.split("/").pop() + window.location.search;
+
+    window.location.href = `login.html?redirect=${encodeURIComponent(currentPage)}`;
+    throw new Error("User is not logged in.");
+  }
+
+  return await user.getIdToken(true);
+}
 const FamilyUtils = {
   dataCache: {
     people: [],
@@ -12,23 +39,15 @@ const FamilyUtils = {
   isLoaded: false,
 
 async request(path, options = {}) {
-  const publicPaths = ["/health"];
+  const publicPaths = ["/health", "/env-check"];
 
   let token = null;
 
   if (!publicPaths.includes(path)) {
-    if (!window.FamilyAuth) {
-      throw new Error("FamilyAuth is not loaded.");
-    }
-
-    token = await window.FamilyAuth.getTokenOrRedirect();
-
-    if (!token) {
-      throw new Error("Authentication token not available.");
-    }
+    token = await getFirebaseAuthToken();
   }
 
-  console.log("API request:", path, token ? "token attached" : "no token");
+  console.log("API request:", path, token ? "token attached" : "public request");
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
@@ -49,7 +68,6 @@ async request(path, options = {}) {
 
   return data;
 },
-
   renderBackendStatus(status, message) {
   const navLinks = document.querySelector(".nav-links");
 
