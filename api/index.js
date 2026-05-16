@@ -72,7 +72,9 @@ app.get("/api/me", requireAuth, (req, res) => {
 app.use("/api/people", requireAuth, peopleRoutes);
 app.use("/api/relationships", requireAuth, relationshipRoutes);
 app.use("/api/data", requireAuth, dataRoutes);
-app.use("/api/neo4j", neo4jRoutes);
+if (process.env.NODE_ENV !== "production") {
+  app.use("/api/neo4j", neo4jRoutes);
+}
 
 app.use((req, res) => {
   res.status(404).json({
