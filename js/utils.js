@@ -11,12 +11,16 @@ const FamilyUtils = {
 
   isLoaded: false,
 
-  async request(path, options = {}) {
+async request(path, options = {}) {
   const publicPaths = ["/health"];
 
   let token = null;
 
-  if (!publicPaths.includes(path) && window.FamilyAuth) {
+  if (!publicPaths.includes(path)) {
+    if (!window.FamilyAuth) {
+      throw new Error("FamilyAuth is not loaded.");
+    }
+
     token = await window.FamilyAuth.getTokenOrRedirect();
   }
 
@@ -39,6 +43,7 @@ const FamilyUtils = {
 
   return data;
 },
+
 
   renderBackendStatus(status, message) {
   const navLinks = document.querySelector(".nav-links");

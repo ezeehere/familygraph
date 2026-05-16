@@ -130,7 +130,7 @@ async getTokenOrRedirect() {
     });
   });
 }
-};
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   if (window.location.pathname.includes("login.html")) {
