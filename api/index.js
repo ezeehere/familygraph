@@ -71,7 +71,7 @@ app.get("/api/me", requireAuth, (req, res) => {
 
 app.use("/api/people", requireAuth, peopleRoutes);
 app.use("/api/relationships", requireAuth, relationshipRoutes);
-app.use("/api/data", dataRoutes);
+app.use("/api/data", requireAuth, dataRoutes);
 app.use("/api/neo4j", neo4jRoutes);
 
 app.use((req, res) => {
