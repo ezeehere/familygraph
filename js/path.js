@@ -463,13 +463,23 @@ function renderPathResult(result, startId, endId) {
   const summary = document.createElement("div");
   summary.className = "path-summary-card";
 
-  const smartSentence = getSmartRelationSentence(start, end, result.steps);
+const smartSentence = getSmartRelationSentence(start, end, result.steps);
+const assameseSentence = getAssameseRelationSentence(
+  smartSentence,
+  start,
+  end,
+  result.steps.length
+);
 
 summary.innerHTML = `
   <h3>Connection found</h3>
 
   <div class="smart-relation-sentence">
     ${smartSentence}
+  </div>
+
+  <div class="smart-relation-sentence assamese-relation-sentence">
+    ${assameseSentence}
   </div>
 
   <p>

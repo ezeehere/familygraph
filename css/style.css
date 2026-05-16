@@ -3062,3 +3062,68 @@ a {
     font-size: 26px;
   }
 }
+
+.quick-add-card h2 {
+  margin-bottom: 8px;
+}
+
+.quick-add-grid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.quick-add-grid button {
+  min-height: 76px;
+  border-radius: 20px;
+  border: 1px solid #dce5cf;
+  background: #f4f8ed;
+  color: var(--green-dark);
+  font-weight: 900;
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+  place-items: center;
+  padding: 12px;
+}
+
+.quick-add-grid button small {
+  font-size: 12px;
+  color: #5f6c55;
+  font-weight: 800;
+}
+
+.quick-add-grid button:hover {
+  transform: translateY(-2px);
+  background: #edf6df;
+}
+
+@media (max-width: 760px) {
+  .quick-add-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .quick-add-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.relation-select {
+  line-height: 1.4;
+}
+
+@media (max-width: 620px) {
+  .relation-select {
+    font-size: 14px;
+  }
+}
+
+.assamese-relation-sentence {
+  margin-top: 10px;
+  background: #fff6ed;
+  color: #7a4318;
+  border-color: #c78648;
+}

@@ -78,6 +78,109 @@ function getRelationLabel(relation, currentPersonId, otherPerson) {
   return otherPerson?.note || "Related";
 }
 
+
+function getGenderFromPrompt(defaultGender = "unknown") {
+  const input = prompt("Gender? Type male, female, or leave blank.");
+
+  if (!input) return defaultGender;
+
+  const gender = input.trim().toLowerCase();
+
+  if (gender === "male") return "male";
+  if (gender === "female") return "female";
+
+  return "unknown";
+}
+
+async function quickAddRelative(focusPersonId, relationKind) {
+  const focusPerson = FamilyUtils.getPersonById(focusPersonId);
+
+  if (!focusPerson) {
+    alert("Focus person not found.");
+    return;
+  }
+
+  let promptText = "Enter name";
+  let gender = "unknown";
+  let note = "Family member";
+  let relationType = "";
+  let fromId = "";
+  let toId = "";
+
+  if (relationKind === "father") {
+    promptText = `Enter father's name for ${focusPerson.name}`;
+    gender = "male";
+    note = "Father";
+    relationType = "PARENT_OF";
+  }
+
+  if (relationKind === "mother") {
+    promptText = `Enter mother's name for ${focusPerson.name}`;
+    gender = "female";
+    note = "Mother";
+    relationType = "PARENT_OF";
+  }
+
+  if (relationKind === "spouse") {
+    promptText = `Enter spouse name for ${focusPerson.name}`;
+    gender = getGenderFromPrompt("unknown");
+    note = "Spouse";
+    relationType = "MARRIED_TO";
+  }
+
+  if (relationKind === "child") {
+    promptText = `Enter child name for ${focusPerson.name}`;
+    gender = getGenderFromPrompt("unknown");
+    note = "Child";
+    relationType = "PARENT_OF";
+  }
+
+  const name = prompt(promptText);
+
+  if (!name || !name.trim()) {
+    return;
+  }
+
+  const personResult = await FamilyUtils.addPerson({
+    name: name.trim(),
+    gender,
+    note
+  });
+
+  if (!personResult.success) {
+    alert(personResult.message);
+    return;
+  }
+
+  const newPerson = personResult.person;
+
+  if (relationKind === "father" || relationKind === "mother") {
+    fromId = newPerson.id;
+    toId = focusPerson.id;
+  }
+
+  if (relationKind === "spouse") {
+    fromId = focusPerson.id;
+    toId = newPerson.id;
+  }
+
+  if (relationKind === "child") {
+    fromId = focusPerson.id;
+    toId = newPerson.id;
+  }
+
+  const relationResult = await FamilyUtils.addRelationship(fromId, toId, relationType);
+
+  if (!relationResult.success) {
+    alert(relationResult.message);
+    return;
+  }
+
+  await FamilyUtils.loadData();
+
+  window.location.href = `profile.html?id=${focusPerson.id}`;
+}
+
 function renderProfile(person) {
   const relationships = FamilyUtils.getAllRelationships();
 
@@ -128,6 +231,35 @@ function renderProfile(person) {
         <a href="path.html">Find Path</a>
       </div>
     </section>
+
+    <section class="profile-clean-card quick-add-card">
+  <h2>Quick add family</h2>
+  <p class="empty-profile-text">
+    Add close family members directly from this profile.
+  </p>
+
+  <div class="quick-add-grid">
+    <button type="button" onclick="quickAddRelative('${person.id}', 'father')">
+      Add Father
+      <small>দেউতা যোগ কৰক</small>
+    </button>
+
+    <button type="button" onclick="quickAddRelative('${person.id}', 'mother')">
+      Add Mother
+      <small>মা যোগ কৰক</small>
+    </button>
+
+    <button type="button" onclick="quickAddRelative('${person.id}', 'spouse')">
+      Add Spouse
+      <small>জীৱনসঙ্গী যোগ কৰক</small>
+    </button>
+
+    <button type="button" onclick="quickAddRelative('${person.id}', 'child')">
+      Add Child
+      <small>সন্তান যোগ কৰক</small>
+    </button>
+  </div>
+</section>
 
     <section class="profile-clean-card">
       <h2>Connected people</h2>
