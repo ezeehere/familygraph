@@ -179,6 +179,9 @@ const groupConfig = [
 
 function getFocusPerson() {
   const id = FamilyUtils.getPersonIdFromUrl();
+
+  if (!id) return null;
+
   return FamilyUtils.getPersonById(id);
 }
 
@@ -694,20 +697,26 @@ function renderTree() {
 async function initTreePage() {
   await FamilyUtils.loadData();
 
-  const person = getFocusPerson();
+  const people = FamilyUtils.getAllPeople();
+
+  if (people.length === 0) {
+    window.location.href = "setup-profile.html";
+    return;
+  }
+
+  let person = getFocusPerson();
 
   if (!person) {
-    focusNode.textContent = "Person not found";
-    relationNodes.innerHTML = `
-      <div class="empty-family-state">
-        This person does not exist in backend data.
-      </div>
-    `;
+    const rootPerson = people.find((item) => {
+      return item.isRoot === true || item.authUid;
+    });
 
-    if (treeLines) {
-      treeLines.innerHTML = "";
+    if (rootPerson) {
+      window.location.href = `tree.html?id=${rootPerson.id}`;
+      return;
     }
 
+    window.location.href = "setup-profile.html";
     return;
   }
 

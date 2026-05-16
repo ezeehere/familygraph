@@ -325,7 +325,7 @@ importDataInput.addEventListener("change", (event) => {
 
 resetDataBtn.addEventListener("click", async () => {
   const confirmReset = confirm(
-    "Reset database to sample data? This will remove all current backend changes."
+    "Reset your family graph? This will remove all people and relationships from your account."
   );
 
   if (!confirmReset) return;
@@ -337,10 +337,9 @@ resetDataBtn.addEventListener("click", async () => {
 
   if (result.success) {
     resetPersonForm();
-    refreshPageData();
+    window.location.href = "setup-profile.html";
   }
 });
-
 async function initPeoplePage() {
   relationMessage.textContent = "Loading backend data...";
   const result = await FamilyUtils.loadData();

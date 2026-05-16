@@ -545,25 +545,19 @@ async function initPathPage() {
 
   const people = FamilyUtils.getAllPeople();
 
-  if (!people || people.length === 0) {
-    pathResult.innerHTML = `
-      <div class="empty-family-state">
-        No people found. Please check http://localhost:5000/api/people
-      </div>
-    `;
-    return;
-  }
+    if (!people || people.length === 0) {
+      window.location.href = "setup-profile.html";
+      return;
+    }
 
-  renderPersonOptions();
-
-  if (people.length < 2) {
-    pathResult.innerHTML = `
-      <div class="empty-family-state">
-        Add at least two people to find a relationship path.
-      </div>
-    `;
-    return;
-  }
+    if (people.length < 2) {
+      pathResult.innerHTML = `
+        <div class="empty-family-state">
+          Add at least two people to find a relationship path.
+        </div>
+      `;
+      return;
+    }
 
   startPerson.value = people[0].id;
   endPerson.value = people[1].id;
