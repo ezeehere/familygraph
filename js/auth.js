@@ -104,13 +104,32 @@ window.FamilyAuth = {
   },
 
   async getCurrentUser() {
-    return new Promise((resolve) => {
-      const unsubscribe = auth.onAuthStateChanged((user) => {
-        unsubscribe();
-        resolve(user);
-      });
+  return new Promise((resolve) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      unsubscribe();
+      resolve(user);
     });
-  }
+  });
+},
+
+async getTokenOrRedirect() {
+  return new Promise((resolve) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      unsubscribe();
+
+      if (!user) {
+        const redirect = encodeURIComponent(getCurrentPath());
+        window.location.href = `login.html?redirect=${redirect}`;
+        return;
+      }
+
+      const token = await user.getIdToken();
+      this.renderLogoutButton(user);
+
+      resolve(token);
+    });
+  });
+}
 };
 
 document.addEventListener("DOMContentLoaded", () => {

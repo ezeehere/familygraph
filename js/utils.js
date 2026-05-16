@@ -11,6 +11,35 @@ const FamilyUtils = {
 
   isLoaded: false,
 
+  async request(path, options = {}) {
+  const publicPaths = ["/health"];
+
+  let token = null;
+
+  if (!publicPaths.includes(path) && window.FamilyAuth) {
+    token = await window.FamilyAuth.getTokenOrRedirect();
+  }
+
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {})
+    }
+  });
+
+  const data = await response.json().catch(() => {
+    return {};
+  });
+
+  if (!response.ok) {
+    throw new Error(data.message || "Request failed.");
+  }
+
+  return data;
+},
+
   renderBackendStatus(status, message) {
   const navLinks = document.querySelector(".nav-links");
 
@@ -96,47 +125,46 @@ async checkBackendHealth() {
   },
 
   async loadData() {
-    try {
-      const [people, relationships] = await Promise.all([
-        this.request("/people"),
-        this.request("/relationships")
-      ]);
+  try {
+    const [people, relationships] = await Promise.all([
+      this.request("/people"),
+      this.request("/relationships")
+    ]);
 
-      this.dataCache = {
-        people,
-        relationships
-      };
+    this.dataCache = {
+      people,
+      relationships
+    };
 
-      this.isLoaded = true;
-      this.renderBackendStatus("online", "Backend connected");
+    this.isLoaded = true;
+    this.renderBackendStatus("online", "Backend connected");
 
-      return {
-        success: true,
-        message: "Backend data loaded."
-      };
-    } catch (error) {
-      console.error("Backend load failed:", error);
+    return {
+      success: true,
+      message: "Backend data loaded."
+    };
+  } catch (error) {
+    console.error("Backend load failed:", error);
 
-      const fallbackData = window.FAMILY_DATA || {
-        people: [],
-        relationships: []
-      };
+    const fallbackData = window.FAMILY_DATA || {
+      people: [],
+      relationships: []
+    };
 
-      this.dataCache = {
-        people: fallbackData.people || [],
-        relationships: fallbackData.relationships || []
-      };
+    this.dataCache = {
+      people: fallbackData.people || [],
+      relationships: fallbackData.relationships || []
+    };
 
-      this.isLoaded = true;
-      this.renderBackendStatus("offline", "Backend offline");
+    this.isLoaded = true;
+    this.renderBackendStatus("offline", "Backend offline");
 
-      return {
-        success: false,
-        message: "Backend failed. Loaded fallback data."
-      };
-    }
-  },
-
+    return {
+      success: false,
+      message: "Backend failed. Loaded fallback data."
+    };
+  }
+},
 
 
   getBaseData() {
@@ -163,27 +191,26 @@ async checkBackendHealth() {
   },
 
   async addPerson(person) {
-    try {
-      const result = await this.request("/people", {
-        method: "POST",
-        body: JSON.stringify(person)
-      });
+  try {
+    const result = await this.request("/people", {
+      method: "POST",
+      body: JSON.stringify(person)
+    });
 
-      await this.loadData();
+    await this.loadData();
 
-      return {
-        success: true,
-        message: result.message || "Person added.",
-        person: result.person
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message
-      };
-    }
-  },
-
+    return {
+      success: true,
+      message: result.message || "Person added.",
+      person: result.person
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message
+    };
+  }
+},
   async updatePerson(personId, updatedData) {
     try {
       const result = await this.request(`/people/${personId}`, {
