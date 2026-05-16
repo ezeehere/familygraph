@@ -28,6 +28,8 @@ async request(path, options = {}) {
     }
   }
 
+  console.log("API request:", path, token ? "token attached" : "no token");
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers: {
@@ -47,7 +49,6 @@ async request(path, options = {}) {
 
   return data;
 },
-
 
   renderBackendStatus(status, message) {
   const navLinks = document.querySelector(".nav-links");
