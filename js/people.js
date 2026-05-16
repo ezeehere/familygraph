@@ -344,6 +344,16 @@ resetDataBtn.addEventListener("click", async () => {
 async function initPeoplePage() {
   relationMessage.textContent = "Loading backend data...";
   const result = await FamilyUtils.loadData();
+  const people = FamilyUtils.getAllPeople();
+
+const hasRootPerson = people.some((person) => {
+  return person.isRoot === true || person.authUid;
+});
+
+if (!hasRootPerson) {
+  window.location.href = "setup-profile.html";
+  return;
+}
   relationMessage.textContent = result.message;
   refreshPageData();
 }

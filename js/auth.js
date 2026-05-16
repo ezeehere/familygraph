@@ -2,7 +2,7 @@ const auth = firebase.auth();
 
 function getRedirectPath() {
   const params = new URLSearchParams(window.location.search);
-  return params.get("redirect") || "people.html";
+  return params.get("redirect") || "setup-profile.html";
 }
 
 function getCurrentPath() {

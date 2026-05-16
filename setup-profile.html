@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>FamilyGraph | Setup Profile</title>
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <main class="app-frame">
+    <header class="top-bar">
+      <a class="brand-name" href="index.html">FamilyGraph</a>
+
+      <nav class="nav-links">
+        <a href="people.html">People</a>
+      </nav>
+    </header>
+
+    <section class="auth-screen">
+      <div class="auth-card">
+        <h1>Create your profile</h1>
+        <p>This will be the first person in your family tree.</p>
+
+        <form id="setupProfileForm" class="auth-form">
+          <input id="setupName" type="text" placeholder="Your full name" required />
+
+          <select id="setupGender" required>
+            <option value="unknown">Select gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="unknown">Prefer not to say</option>
+          </select>
+
+          <input id="setupBirthYear" type="number" placeholder="Birth year optional" />
+
+          <input id="setupNote" type="text" placeholder="Short note optional" />
+
+          <button type="submit">Create My Profile</button>
+        </form>
+
+        <p id="setupMessage" class="form-message"></p>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+
+  <script src="js/firebase-config.js?v=1"></script>
+  <script src="js/auth.js?v=1"></script>
+  <script src="js/api.js?v=1"></script>
+
+  <script src="js/data.js?v=1"></script>
+  <script src="js/utils.js?v=1"></script>
+  <script src="js/setup-profile.js?v=1"></script>
+</body>
+</html>
