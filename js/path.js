@@ -260,11 +260,13 @@ function renderPathResult(result, startId, endId) {
         ${
           nextStep
             ? `<div class="path-connector">
-                ${getRelationName(
-                  nextStep,
-                  FamilyUtils.getPersonById(nextStep.from),
-                  FamilyUtils.getPersonById(nextStep.to)
-                )}
+                <span>
+                  ${getRelationName(
+                    nextStep,
+                    FamilyUtils.getPersonById(nextStep.from),
+                    FamilyUtils.getPersonById(nextStep.to)
+                  )}
+                </span>
               </div>`
             : ""
         }

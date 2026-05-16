@@ -3184,3 +3184,77 @@ textarea {
   color: #4d5549;
   font-weight: 800;
 }
+
+.path-chain {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.path-connector {
+  position: relative;
+  min-width: 130px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.path-connector::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 3px;
+  background: var(--green-dark);
+  transform: translateY(-50%);
+  border-radius: 999px;
+}
+
+.path-connector span {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  background: #fffdf8;
+  border: 1px solid #dce5cf;
+  color: var(--green-dark);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+  white-space: nowrap;
+  box-shadow: 0 8px 18px rgba(53, 69, 38, 0.08);
+}
+
+@media (max-width: 760px) {
+  .path-chain {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .path-connector {
+    width: 100%;
+    min-width: 100%;
+    height: 70px;
+  }
+
+  .path-connector::before {
+    left: 50%;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    height: 100%;
+    transform: translateX(-50%);
+  }
+
+  .path-connector span {
+    top: 50%;
+    left: calc(50% + 24px);
+    transform: translateY(-50%);
+  }
+}
