@@ -6,33 +6,25 @@ const {
   addPerson,
   updatePerson,
   deletePerson
-} = require("../utils/neo4j-store");
+} = require("../utils/neo4j-store.js");
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    console.log("GET /api/people called");
-
-    const people = await getAllPeople();
-
-    console.log("People fetched:", people.length);
-
+    const people = await getAllPeople(req.user.uid);
     res.json(people);
   } catch (error) {
-    console.error("GET /api/people failed:", error);
-
     res.status(500).json({
-      message: "Could not fetch people from Neo4j.",
-      error: error.message,
-      stack: error.stack
+      message: "Could not fetch people.",
+      error: error.message
     });
   }
 });
 
 router.get("/:id", async (req, res) => {
   try {
-    const person = await getPersonById(req.params.id);
+    const person = await getPersonById(req.user.uid, req.params.id);
 
     if (!person) {
       return res.status(404).json({
@@ -43,7 +35,7 @@ router.get("/:id", async (req, res) => {
     res.json(person);
   } catch (error) {
     res.status(500).json({
-      message: "Could not fetch person from Neo4j.",
+      message: "Could not fetch person.",
       error: error.message
     });
   }
@@ -51,10 +43,10 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const person = await addPerson(req.body);
+    const person = await addPerson(req.user.uid, req.body);
 
     res.status(201).json({
-      message: "Person added to Neo4j.",
+      message: "Person added.",
       person
     });
   } catch (error) {
@@ -66,7 +58,7 @@ router.post("/", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    const person = await updatePerson(req.params.id, req.body);
+    const person = await updatePerson(req.user.uid, req.params.id, req.body);
 
     if (!person) {
       return res.status(404).json({
@@ -75,7 +67,7 @@ router.put("/:id", async (req, res) => {
     }
 
     res.json({
-      message: "Person updated in Neo4j.",
+      message: "Person updated.",
       person
     });
   } catch (error) {
@@ -87,7 +79,7 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    const deleted = await deletePerson(req.params.id);
+    const deleted = await deletePerson(req.user.uid, req.params.id);
 
     if (!deleted) {
       return res.status(404).json({
@@ -96,11 +88,11 @@ router.delete("/:id", async (req, res) => {
     }
 
     res.json({
-      message: "Person and linked relationships deleted from Neo4j."
+      message: "Person and linked relationships deleted."
     });
   } catch (error) {
     res.status(500).json({
-      message: "Could not delete person from Neo4j.",
+      message: "Could not delete person.",
       error: error.message
     });
   }

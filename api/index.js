@@ -68,7 +68,7 @@ app.get("/api/me", requireAuth, (req, res) => {
   });
 });
 
-app.use("/api/people", peopleRoutes);
+app.use("/api/people", requireAuth, peopleRoutes);
 app.use("/api/relationships", relationshipRoutes);
 app.use("/api/data", dataRoutes);
 app.use("/api/neo4j", neo4jRoutes);

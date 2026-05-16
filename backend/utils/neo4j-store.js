@@ -46,74 +46,84 @@ function createId(prefix) {
   return `${prefix}-${crypto.randomUUID()}`;
 }
 
-async function getAllPeople() {
+function formatPerson(person) {
+  return {
+    id: person.id,
+    graphId: person.graphId || "",
+    authUid: person.authUid || "",
+    isRoot: Boolean(person.isRoot),
+    name: person.name,
+    gender: person.gender || "unknown",
+    birthYear: person.birthYear || "",
+    note: person.note || ""
+  };
+}
+
+async function getAllPeople(graphId) {
   const session = driver.session();
 
   try {
-    const result = await session.run(`
-      MATCH (p:Person)
+    const result = await session.run(
+      `
+      MATCH (p:Person {graphId: $graphId})
       RETURN p
       ORDER BY p.name
-    `);
+      `,
+      { graphId }
+    );
 
     return result.records.map((record) => {
-      const person = record.get("p").properties;
-
-      return {
-        id: person.id,
-        name: person.name,
-        gender: person.gender || "unknown",
-        birthYear: person.birthYear || "",
-        note: person.note || ""
-      };
+      return formatPerson(record.get("p").properties);
     });
   } finally {
     await session.close();
   }
 }
 
-async function getPersonById(id) {
+async function getPersonById(graphId, id) {
   const session = driver.session();
 
   try {
     const result = await session.run(
       `
-      MATCH (p:Person {id: $id})
+      MATCH (p:Person {id: $id, graphId: $graphId})
       RETURN p
       `,
-      { id }
+      {
+        id,
+        graphId
+      }
     );
 
-    if (result.records.length === 0) return null;
+    if (result.records.length === 0) {
+      return null;
+    }
 
-    const person = result.records[0].get("p").properties;
-
-    return {
-      id: person.id,
-      name: person.name,
-      gender: person.gender || "unknown",
-      birthYear: person.birthYear || "",
-      note: person.note || ""
-    };
+    return formatPerson(result.records[0].get("p").properties);
   } finally {
     await session.close();
   }
 }
 
-async function addPerson(data) {
+async function addPerson(graphId, data) {
   const session = driver.session();
 
   const name = cleanText(data.name);
   const gender = normalizeGender(data.gender);
   const note = cleanText(data.note) || "New person";
   const birthYear = data.birthYear || "";
+  const isRoot = Boolean(data.isRoot);
+  const authUid = data.authUid || "";
 
   if (!name) {
     throw new Error("Name is required.");
   }
 
   const newPerson = {
-    id: createId("person"),
+    id: data.id || createId("person"),
+    graphId,
+    authUid,
+    isRoot,
     name,
     gender,
     birthYear,
@@ -125,6 +135,9 @@ async function addPerson(data) {
       `
       CREATE (p:Person {
         id: $id,
+        graphId: $graphId,
+        authUid: $authUid,
+        isRoot: $isRoot,
         name: $name,
         gender: $gender,
         birthYear: $birthYear,
@@ -140,7 +153,7 @@ async function addPerson(data) {
   }
 }
 
-async function updatePerson(id, data) {
+async function updatePerson(graphId, id, data) {
   const session = driver.session();
 
   const name = cleanText(data.name);
@@ -155,7 +168,7 @@ async function updatePerson(id, data) {
   try {
     const result = await session.run(
       `
-      MATCH (p:Person {id: $id})
+      MATCH (p:Person {id: $id, graphId: $graphId})
       SET
         p.name = $name,
         p.gender = $gender,
@@ -165,6 +178,7 @@ async function updatePerson(id, data) {
       `,
       {
         id,
+        graphId,
         name,
         gender,
         birthYear,
@@ -176,32 +190,27 @@ async function updatePerson(id, data) {
       return null;
     }
 
-    const person = result.records[0].get("p").properties;
-
-    return {
-      id: person.id,
-      name: person.name,
-      gender: person.gender || "unknown",
-      birthYear: person.birthYear || "",
-      note: person.note || ""
-    };
+    return formatPerson(result.records[0].get("p").properties);
   } finally {
     await session.close();
   }
 }
 
-async function deletePerson(id) {
+async function deletePerson(graphId, id) {
   const session = driver.session();
 
   try {
     const result = await session.run(
       `
-      MATCH (p:Person {id: $id})
+      MATCH (p:Person {id: $id, graphId: $graphId})
       WITH p, count(p) AS found
       DETACH DELETE p
       RETURN found
       `,
-      { id }
+      {
+        id,
+        graphId
+      }
     );
 
     const found = result.records[0]?.get("found")?.toNumber?.() || 0;
@@ -211,7 +220,6 @@ async function deletePerson(id) {
     await session.close();
   }
 }
-
 async function getAllRelationships() {
   const session = driver.session();
 
