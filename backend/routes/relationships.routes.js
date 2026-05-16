@@ -4,17 +4,27 @@ const {
   getAllRelationships,
   addRelationship,
   deleteRelationship
-} = require("../utils/neo4j-store");
+} = require("../utils/neo4j-store.js");
 
 const router = express.Router();
 
+router.use((req, res, next) => {
+  if (!req.user || !req.user.uid) {
+    return res.status(401).json({
+      message: "User authentication missing in relationships route."
+    });
+  }
+
+  next();
+});
+
 router.get("/", async (req, res) => {
   try {
-    const relationships = await getAllRelationships();
+    const relationships = await getAllRelationships(req.user.uid);
     res.json(relationships);
   } catch (error) {
     res.status(500).json({
-      message: "Could not fetch relationships from Neo4j.",
+      message: "Could not fetch relationships.",
       error: error.message
     });
   }
@@ -22,10 +32,10 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const relationship = await addRelationship(req.body);
+    const relationship = await addRelationship(req.user.uid, req.body);
 
     res.status(201).json({
-      message: "Relationship added to Neo4j.",
+      message: "Relationship added.",
       relationship
     });
   } catch (error) {
@@ -37,7 +47,7 @@ router.post("/", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    const deleted = await deleteRelationship(req.params.id);
+    const deleted = await deleteRelationship(req.user.uid, req.params.id);
 
     if (!deleted) {
       return res.status(404).json({
@@ -46,11 +56,11 @@ router.delete("/:id", async (req, res) => {
     }
 
     res.json({
-      message: "Relationship deleted from Neo4j."
+      message: "Relationship deleted."
     });
   } catch (error) {
     res.status(500).json({
-      message: "Could not delete relationship from Neo4j.",
+      message: "Could not delete relationship.",
       error: error.message
     });
   }

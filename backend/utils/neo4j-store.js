@@ -220,19 +220,23 @@ async function deletePerson(graphId, id) {
     await session.close();
   }
 }
-async function getAllRelationships() {
+async function getAllRelationships(graphId) {
   const session = driver.session();
 
   try {
-    const result = await session.run(`
-      MATCH (from:Person)-[r]->(to:Person)
+    const result = await session.run(
+      `
+      MATCH (from:Person {graphId: $graphId})-[r]->(to:Person {graphId: $graphId})
+      WHERE r.graphId = $graphId
       RETURN
         r.id AS id,
         from.id AS from,
         to.id AS to,
         type(r) AS type
       ORDER BY type, from, to
-    `);
+      `,
+      { graphId }
+    );
 
     return result.records.map((record) => {
       return {
@@ -247,18 +251,18 @@ async function getAllRelationships() {
   }
 }
 
-async function relationshipExists(from, to, type) {
+async function relationshipExists(graphId, from, to, type) {
   const session = driver.session();
 
   try {
     let query = `
-      MATCH (a:Person {id: $from})-[r:${type}]->(b:Person {id: $to})
+      MATCH (a:Person {id: $from, graphId: $graphId})-[r:${type} {graphId: $graphId}]->(b:Person {id: $to, graphId: $graphId})
       RETURN count(r) AS count
     `;
 
     if (twoWayRelationshipTypes.includes(type)) {
       query = `
-        MATCH (a:Person)-[r:${type}]-(b:Person)
+        MATCH (a:Person {graphId: $graphId})-[r:${type} {graphId: $graphId}]-(b:Person {graphId: $graphId})
         WHERE
           (a.id = $from AND b.id = $to)
           OR
@@ -267,7 +271,12 @@ async function relationshipExists(from, to, type) {
       `;
     }
 
-    const result = await session.run(query, { from, to });
+    const result = await session.run(query, {
+      graphId,
+      from,
+      to
+    });
+
     const count = result.records[0].get("count").toNumber();
 
     return count > 0;
@@ -276,7 +285,7 @@ async function relationshipExists(from, to, type) {
   }
 }
 
-async function addRelationship(data) {
+async function addRelationship(graphId, data) {
   const session = driver.session();
 
   const from = cleanText(data.from);
@@ -295,7 +304,7 @@ async function addRelationship(data) {
     throw new Error("Invalid relationship type.");
   }
 
-  const alreadyExists = await relationshipExists(from, to, type);
+  const alreadyExists = await relationshipExists(graphId, from, to, type);
 
   if (alreadyExists) {
     throw new Error("This relationship already exists.");
@@ -303,6 +312,7 @@ async function addRelationship(data) {
 
   const relationship = {
     id: createId("rel"),
+    graphId,
     from,
     to,
     type
@@ -311,10 +321,11 @@ async function addRelationship(data) {
   try {
     const result = await session.run(
       `
-      MATCH (fromPerson:Person {id: $from})
-      MATCH (toPerson:Person {id: $to})
+      MATCH (fromPerson:Person {id: $from, graphId: $graphId})
+      MATCH (toPerson:Person {id: $to, graphId: $graphId})
       CREATE (fromPerson)-[r:${type} {
         id: $id,
+        graphId: $graphId,
         type: $type
       }]->(toPerson)
       RETURN r.id AS id
@@ -323,7 +334,7 @@ async function addRelationship(data) {
     );
 
     if (result.records.length === 0) {
-      throw new Error("Both people must exist.");
+      throw new Error("Both people must exist in your graph.");
     }
 
     return relationship;
@@ -332,18 +343,21 @@ async function addRelationship(data) {
   }
 }
 
-async function deleteRelationship(id) {
+async function deleteRelationship(graphId, id) {
   const session = driver.session();
 
   try {
     const result = await session.run(
       `
-      MATCH ()-[r {id: $id}]->()
+      MATCH ()-[r {id: $id, graphId: $graphId}]->()
       WITH r, count(r) AS found
       DELETE r
       RETURN found
       `,
-      { id }
+      {
+        id,
+        graphId
+      }
     );
 
     const found = result.records[0]?.get("found")?.toNumber?.() || 0;
