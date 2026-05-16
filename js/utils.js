@@ -22,6 +22,10 @@ async request(path, options = {}) {
     }
 
     token = await window.FamilyAuth.getTokenOrRedirect();
+
+    if (!token) {
+      throw new Error("Authentication token not available.");
+    }
   }
 
   const response = await fetch(`${API_BASE_URL}${path}`, {

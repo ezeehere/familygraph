@@ -9,6 +9,15 @@ function getCurrentPath() {
   return window.location.pathname.split("/").pop() + window.location.search;
 }
 
+function waitForAuthUser() {
+  return new Promise((resolve) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      unsubscribe();
+      resolve(user);
+    });
+  });
+}
+
 window.FamilyAuth = {
   setupLoginPage() {
     const loginForm = document.getElementById("loginForm");
@@ -104,33 +113,23 @@ window.FamilyAuth = {
   },
 
   async getCurrentUser() {
-  return new Promise((resolve) => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      unsubscribe();
-      resolve(user);
-    });
-  });
-},
+    return await waitForAuthUser();
+  },
 
-async getTokenOrRedirect() {
-  return new Promise((resolve) => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      unsubscribe();
+  async getTokenOrRedirect() {
+    const user = await waitForAuthUser();
 
-      if (!user) {
-        const redirect = encodeURIComponent(getCurrentPath());
-        window.location.href = `login.html?redirect=${redirect}`;
-        return;
-      }
+    if (!user) {
+      const redirect = encodeURIComponent(getCurrentPath());
+      window.location.href = `login.html?redirect=${redirect}`;
+      return null;
+    }
 
-      const token = await user.getIdToken();
-      this.renderLogoutButton(user);
+    this.renderLogoutButton(user);
 
-      resolve(token);
-    });
-  });
-}
-}
+    return await user.getIdToken(true);
+  }
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   if (window.location.pathname.includes("login.html")) {
