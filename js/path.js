@@ -584,7 +584,4 @@ async function initPathPage() {
     pathResult.innerHTML = "Please select valid people.";
   }
 }
-
-initPathPage();
-
 initPathPage();
